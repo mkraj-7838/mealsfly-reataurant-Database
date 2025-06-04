@@ -1,77 +1,58 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/database');
-const errorHandler = require('./middleware/error');
-const Admin = require('./models/Admin');
-const bcrypt = require('bcrypt');
-require('dotenv').config();
-
 const adminRoutes = require('./routes/adminRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
+const Admin = require('./models/Admin');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({
-    origin: 'https://mealsfly-reataurant-database.onrender.com/', // Adjust to your frontend's origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Create default admin user
-const createDefaultAdmin = async () => {
-    try {
-        const existingAdmin = await Admin.findOne({ username: 'admin' });
-        if (!existingAdmin) {
-            const hashedPassword = await bcrypt.hash('admin123', 10);
-            const admin = new Admin({
-                username: 'admin',
-                password: hashedPassword
-            });
-            await admin.save();
-            console.log('Default admin created: username=admin, password=admin123');
+// Connect to MongoDB
+connectDB();
+
+// Create default admin
+Admin.createDefaultAdmin();
+
+// Routes
+app.use('/api/admin', adminRoutes);
+app.use('/api/restaurants', restaurantRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+    console.error('Error:', error);
+    
+    if (error instanceof multer.MulterError) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ message: 'File size too large. Maximum size is 10MB.' });
         }
-    } catch (error) {
-        console.error('Error creating default admin:', error.message);
     }
-};
+    
+    res.status(500).json({ message: 'Internal server error' });
+});
 
-// Initialize server
-const startServer = async () => {
-    try {
-        // Connect to MongoDB
-        await connectDB();
-        // Create default admin after DB connection
-        await createDefaultAdmin();
-        // Routes
-        app.use('/api/admin', adminRoutes);
-        app.use('/api/restaurants', restaurantRoutes);
-        // Health check endpoint
-        app.get('/api/health', (req, res) => {
-            res.json({ 
-                status: 'OK', 
-                timestamp: new Date().toISOString(),
-                uptime: process.uptime()
-            });
-        });
-        // 404 handler
-        app.use('*', (req, res) => {
-            res.status(404).json({ message: 'Route not found' });
-        });
-        // Error handling middleware
-        app.use(errorHandler);
-        // Start server
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-            console.log(`Health check: https://mealsfly-reataurant-database.onrender.com/api/health`);
-        });
-    } catch (error) {
-        console.error('Server startup error:', error.message);
-        process.exit(1);
-    }
-};
+// 404 handler
+app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+});
 
-startServer();
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/api/health`);
+});
