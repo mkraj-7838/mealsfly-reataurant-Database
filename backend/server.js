@@ -16,17 +16,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-connectDB();
+// connectDB();
 
 // Create default admin
-Admin.createDefaultAdmin();
+// Admin.createDefaultAdmin();
 
 // Routes
 app.use('/api/admin', adminRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/', (req, res) => {
     res.json({ 
         status: 'OK', 
         timestamp: new Date().toISOString(),
@@ -52,7 +52,31 @@ app.use('*', (req, res) => {
     res.status(404).json({ message: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Health check: http://localhost:${PORT}/api/health`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server is running on port ${PORT}`);
+//     console.log(`Health check: http://localhost:${PORT}/api/health`);
+// });
+
+// Connect to MongoDB and initialize
+const startServer = async () => {
+    try {
+        await connectDB();
+        
+        // Wait for connection to be ready before creating admin
+        await mongoose.connection.db.admin().ping();
+        
+        // Initialize default admin
+        await Admin.initializeDefaultAdmin();
+        
+        // Start server
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+            console.log(`Health check: http://localhost:${PORT}/`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+startServer();
