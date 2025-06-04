@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost', // Adjust to your frontend's origin
+    origin: 'https://mealsfly-reataurant-database.onrender.com/', // Adjust to your frontend's origin
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -66,7 +66,7 @@ const startServer = async () => {
         // Start server
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
-            console.log(`Health check: http://localhost:${PORT}/api/health`);
+            console.log(`Health check: https://mealsfly-reataurant-database.onrender.com/api/health`);
         });
     } catch (error) {
         console.error('Server startup error:', error.message);
