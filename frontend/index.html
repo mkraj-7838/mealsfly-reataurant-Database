@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mealsfly - Restaurant Tie-up Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Mealsfly - Restaurant Tie-up Portal</h1>
+        <p>Join Mealsfly to elevate your restaurant business</p>
+        <a href="#restaurantForm" class="hero-cta">Partner with Us</a>
+      </div>
+
+      <div id="homepage" class="main-content">
+        <div class="form-section">
+          <h2 class="form-title">Restaurant Registration Form</h2>
+          <form id="restaurantForm" enctype="multipart/form-data">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="restaurantName">Restaurant Name *</label>
+                <input type="text" id="restaurantName" name="restaurantName" required />
+              </div>
+              <div class="form-group">
+                <label for="ownerName">Owner's Full Name *</label>
+                <input type="text" id="ownerName" name="ownerName" required />
+              </div>
+              <div class="form-group">
+                <label for="phoneNumber">Phone Number *</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" required />
+              </div>
+              <div class="form-group">
+                <label for="businessEmail">Business Email Address *</label>
+                <input type="email" id="businessEmail" name="businessEmail" required />
+              </div>
+              <div class="form-group full-width">
+                <label for="restaurantAddress">Restaurant Address *</label>
+                <textarea id="restaurantAddress" name="restaurantAddress" rows="3" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="operatingHours">Operating Hours *</label>
+                <input type="text" id="operatingHours" name="operatingHours" placeholder="e.g., 9:00 AM - 10:00 PM" required />
+              </div>
+              <div class="form-group">
+                <label for="cuisineType">Cuisine Type *</label>
+                <select id="cuisineType" name="cuisineType" required>
+                  <option value="">Select Cuisine Type</option>
+                  <option value="Indian">Indian</option>
+                  <option value="Chinese">Chinese</option>
+                  <option value="Italian">Italian</option>
+                  <option value="Mexican">Mexican</option>
+                  <option value="Thai">Thai</option>
+                  <option value="Continental">Continental</option>
+                  <option value="Fast Food">Fast Food</option>
+                  <option value="Multi-Cuisine">Multi-Cuisine</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="foodLicense">Food License Document (PDF/Image) *</label>
+                <div class="file-upload">
+                  <input type="file" id="foodLicense" name="foodLicense" accept=".pdf,.jpg,.jpeg,.png" required />
+                  <label for="foodLicense" class="file-upload-label">
+                    <span>Click to upload Food License</span>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="menuSheet">Menu Sheet (PDF/Image) *</label>
+                <div class="file-upload">
+                  <input type="file" id="menuSheet" name="menuSheet" accept=".pdf,.jpg,.jpeg,.png" required />
+                  <label for="menuSheet" class="file-upload-label">
+                    <span>Click to upload Menu Sheet</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn">Submit Registration</button>
+          </form>
+        </div>
+
+        <div class="admin-section">
+          <div class="admin-login">
+            <h3>Admin Login</h3>
+            <form id="adminLoginForm" class="admin-form">
+              <input type="text" id="adminUsername" placeholder="Username" required />
+              <input type="password" id="adminPassword" placeholder="Password" required />
+              <button type="submit" class="admin-btn">Sign In</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div id="adminDashboard" class="dashboard">
+        <div class="dashboard-header">
+          <h2 class="dashboard-title">Mealsfly Admin Dashboard</h2>
+          <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="Search by restaurant name, owner, or email..." />
+          <button onclick="searchRestaurants()">Search</button>
+        </div>
+        <div id="restaurantsContainer">
+          <table class="restaurants-table" id="restaurantsTable">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Restaurant Name</th>
+                <th>Owner Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="restaurantsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">×</span>
+        <h3>Edit Restaurant Details</h3>
+        <form id="editForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="editRestaurantName">Restaurant Name</label>
+              <input type="text" id="editRestaurantName" name="restaurantName" required />
+            </div>
+            <div class="form-group">
+              <label for="editOwnerName">Owner's Full Name</label>
+              <input type="text" id="editOwnerName" name="ownerName" required />
+            </div>
+            <div class="form-group">
+              <label for="editPhoneNumber">Phone Number</label>
+              <input type="tel" id="editPhoneNumber" name="phoneNumber" required />
+            </div>
+            <div class="form-group">
+              <label for="editBusinessEmail">Business Email</label>
+              <input type="email" id="editBusinessEmail" name="businessEmail" required />
+            </div>
+            <div class="form-group full-width">
+              <label for="editRestaurantAddress">Restaurant Address</label>
+              <textarea id="editRestaurantAddress" name="restaurantAddress" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="editOperatingHours">Operating Hours</label>
+              <input type="text" id="editOperatingHours" name="operatingHours" required />
+            </div>
+            <div class="form-group">
+              <label for="editCuisineType">Cuisine Type</label>
+              <select id="editCuisineType" name="cuisineType" required>
+                <option value="Indian">Indian</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Italian">Italian</option>
+                <option value="Mexican">Mexican</option>
+                <option value="Thai">Thai</option>
+                <option value="Continental">Continental</option>
+                <option value="Fast Food">Fast Food</option>
+                <option value="Multi-Cuisine">Multi-Cuisine</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editStatus">Status</label>
+              <select id="editStatus" name="status" required>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <input type="hidden" id="editRestaurantId" />
+          <button type="submit" class="submit-btn">Update Restaurant</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">×</span>
+        <h3>Restaurant Details</h3>
+        <div class="details-grid">
+          <div class="details-group">
+            <label>Restaurant Name</label>
+            <p id="detailsRestaurantName"></p>
+          </div>
+          <div class="details-group">
+            <label>Owner Name</label>
+            <p id="detailsOwnerName"></p>
+          </div>
+          <div class="details-group">
+            <label>Phone Number</label>
+            <p id="detailsPhoneNumber"></p>
+          </div>
+          <div class="details-group">
+            <label>Business Email</label>
+            <p id="detailsBusinessEmail"></p>
+          </div>
+          <div class="details-group full-width">
+            <label>Restaurant Address</label>
+            <p id="detailsRestaurantAddress"></p>
+          </div>
+          <div class="details-group">
+            <label>Operating Hours</label>
+            <p id="detailsOperatingHours"></p>
+          </div>
+          <div class="details-group">
+            <label>Cuisine Type</label>
+            <p id="detailsCuisineType"></p>
+          </div>
+          <div class="details-group">
+            <label>Status</label>
+            <p id="detailsStatus"></p>
+          </div>
+          <div class="details-group">
+            <label>Joined On</label>
+            <p id="detailsCreatedAt"></p>
+          </div>
+          <div class="details-group full-width">
+            <label>Food License</label>
+            <img id="detailsFoodLicense" src="" alt="Food License" style="display: none;" />
+            <p id="detailsFoodLicenseText"></p>
+          </div>
+          <div class="details-group full-width">
+            <label>Menu Sheet</label>
+            <img id="detailsMenuSheet" src="" alt="Menu Sheet" style="display: none;" />
+            <p id="detailsMenuSheetText"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
