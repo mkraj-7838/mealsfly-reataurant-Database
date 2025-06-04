@@ -1,16 +1,17 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/restaurant_tieup', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
+        const conn = await mongoose.connect(process.env.MONGODB_URI, {
+            // Removed deprecated options: useNewUrlParser, useUnifiedTopology
+            serverSelectionTimeoutMS: 30000, // Increase timeout to 30s
+            connectTimeoutMS: 30000, // Increase connection timeout
         });
-        console.log('Connected to MongoDB');
+        console.log(`Connected to MongoDB: ${conn.connection.host}`);
+        return conn; // Return connection for further use if needed
     } catch (error) {
-        console.error('MongoDB connection error:', error);
-        process.exit(1);
+        console.error('MongoDB connection error:', error.message);
+        process.exit(1); // Exit process on failure
     }
 };
 
